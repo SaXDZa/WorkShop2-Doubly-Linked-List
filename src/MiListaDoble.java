@@ -1,3 +1,5 @@
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class MiListaDoble implements ListInterface {
@@ -98,42 +100,122 @@ public class MiListaDoble implements ListInterface {
 
     @Override
     public boolean insertTail(Object object) {
-        
-        return false;
+        DoubleNode nuevo = new DoubleNode(object);
+        if (isEmpty()) {
+            head = nuevo;
+            tail = nuevo;
+        } else {
+            nuevo.anterior = tail;
+            tail.siguiente = nuevo;
+            tail = nuevo;
+        }
+        size++;
+        return true;
     }
 
     @Override
     public boolean set(DoubleNode node, Object object) {
-        return false;
+        if (node == null) {
+            return false;
+        }
+        node.dato = object;
+        return true;
     }
 
     @Override
     public boolean remove(DoubleNode node) {
-        return false;
+        if (node == null || isEmpty()) {
+            return false;
+        }
+
+        if (node != head && node.anterior == null) {
+            return false;
+        }
+        if (node != tail && node.siguiente == null) {
+            return false;
+        }
+
+        if (node == head) {
+            head = node.siguiente;
+        } else {
+            node.anterior.siguiente = node.siguiente;
+        }
+
+        if (node == tail) {
+            tail = node.anterior;
+        } else {
+            node.siguiente.anterior = node.anterior;
+        }
+
+        node.anterior = null;
+        node.siguiente = null;
+        size--;
+        return true;
     }
 
     @Override
     public boolean contains(Object object) {
-        return false;
+        return search(object) != null;
     }
 
     @Override
     public Object[] toArray() {
-        return new Object[0];
+        Object[] arreglo = new Object[size];
+        int i = 0;
+        DoubleNode actual = head;
+        while (actual != null) {
+            arreglo[i++] = actual.dato;
+            actual = actual.siguiente;
+        }
+        return arreglo;
     }
 
     @Override
     public Object[] toArray(Object[] object) {
-        return new Object[0];
+        Object[] arreglo = object;
+        if (arreglo == null) {
+            arreglo = new Object[size];
+        } else if (arreglo.length < size) {
+            arreglo = (Object[])Array.newInstance(arreglo.getClass().getComponentType(),size);
+        }
+        int i = 0;
+        DoubleNode actual = head;
+        while (actual != null) {
+            arreglo[i++] = actual.dato;
+            actual = actual.siguiente;
+        }
+        if (arreglo.length > size) {
+            arreglo[size] = null;
+        }
+        return arreglo;
     }
+
 
     @Override
     public MiListaDoble subList(DoubleNode from, DoubleNode to) {
+        if (from == null || to == null) {
+            return null;
+        }
+        MiListaDoble sub = new MiListaDoble();
+        DoubleNode actual = from;
+        while (actual != null) {
+            sub.insertTail(actual.dato);
+            if (actual == to) {
+                return sub;
+            }
+            actual = actual.siguiente;
+        }
         return null;
     }
 
     @Override
     public MiListaDoble sortList() {
-        return null;
+        Object[] arreglo = toArray();
+        Arrays.sort(arreglo, (a, b) -> ((Comparable) a).compareTo(b));
+        MiListaDoble ordenada = new MiListaDoble();
+        for (Object o : arreglo) {
+            ordenada.insertTail(o);
+        }
+        return ordenada;
     }
 }
